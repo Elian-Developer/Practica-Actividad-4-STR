@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat en Tiempo Real</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="chat-container">
+            <h1>Chat en Tiempo Real</h1><br>
+        <input id="mensaje" autocomplete="off" placeholder="Escribe tu mensaje aqui...">
+        <button id="enviar" style="margin-bottom: 10px;">Enviar</button>
+        <p id="escribiendo"></p><br>
+        <ul id="mensajes"></ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('enviar').onclick = () => {
+            const mensaje = document.getElementById('mensaje').value;
+
+            socket.emit('mensaje', mensaje);
+            document.getElementById('mensaje').value = '';
+            document.getElementById('escribiendo').textContent = '';
+        };
+
+        socket.on('mensaje', (msg) => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            document.getElementById('mensajes').appendChild(item);
+        });
+
+        document.getElementById('mensaje').addEventListener('input', () => {
+            socket.emit('escribiendo', 'Un usuario')
+        })
+
+        socket.on('escribiendo', (usuario) => {
+            document.getElementById('escribiendo').textContent = usuario + ' esta escribiendo...'
+            setTimeout(() => {
+                document.getElementById('escribiendo').textContent = '';
+            }, 5000);
+        });
+
+
+    </script>
+</body>
+</html>
